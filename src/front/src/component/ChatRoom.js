@@ -184,6 +184,7 @@ const ChatRoom = () => {
                         onChange={handleUsername}
                         margin="normal"
                     />
+                    {/*소켓 연결*/}
                     <button type="button" onClick={registerUser}>
                         connect
                     </button>
