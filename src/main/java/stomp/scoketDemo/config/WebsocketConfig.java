@@ -15,7 +15,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app"); // /app/chatroom /app/user/{유저이름}
-        registry.enableSimpleBroker("/chatroom", "/user");
+        registry.enableSimpleBroker("/chatroom", "/user", "/note");
         registry.setUserDestinationPrefix("/user"); // 특정 유저에게
     }
 

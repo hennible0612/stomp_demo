@@ -23,6 +23,13 @@ public class ChatController {
         return message;
     }
 
+    @MessageMapping("/note")
+    @SendTo("/note/public")
+    public Message receiveNote(@Payload Message message){
+        System.out.println(message.toString());
+        return message;
+    }
+
     @MessageMapping("/private-message")
     public Message reveiverPrivateMessage(@Payload Message message) {
         //prefix 자동으로 가져옴

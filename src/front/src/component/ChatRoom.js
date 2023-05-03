@@ -7,6 +7,9 @@ const ChatRoom = () => {
     const [privateChats, setPrivateChats] = useState(new Map());
     const [publicChats, setPublicChats] = useState([]);
     const [tab, setTab] = useState("CHATROOM");
+
+    const [publicNote, setPublicNote] = useState([]);
+
     const [userData, setUserData] = useState({
         username: '',
         receivername: '',
@@ -26,7 +29,13 @@ const ChatRoom = () => {
     const onConnected = () => {
         setUserData({...userData, "connected": true});
         stompClient.subscribe('/chatroom/public', onMessageReceived);
+
+
         stompClient.subscribe('/user/' + userData.username + '/private', onPrivateMessage);
+
+        // 받았을때
+        stompClient.subscribe('/note/public', onNoteReceived);
+
         userJoin();
     }
 
@@ -54,6 +63,7 @@ const ChatRoom = () => {
         }
     }
 
+
     const onPrivateMessage = (payload) => {
         console.log(payload);
         var payloadData = JSON.parse(payload.body);
@@ -77,6 +87,39 @@ const ChatRoom = () => {
         const {value} = event.target;
         setUserData({...userData, "message": value});
     }
+
+    const onNoteReceived = (payload) => {
+
+        const parsedMessage = JSON.parse(payload.body);
+        console.log("-----------------------------------")
+        console.log(parsedMessage.message)
+        console.log("-----------------------------------")
+        setPublicNote(payload);
+
+    };
+
+    //notion 처럼 공유 메모
+    const checkChangeInTextarea = (event) => {
+        const {value} = event.target;
+        setPublicNote(value);
+        sendNoteToAll()
+
+    };
+    const sendNoteToAll = () => {
+        if (stompClient) {
+            var chatMessage = {
+                senderName: userData.username,
+                message: publicNote,
+                status: "MESSAGE"
+            };
+            stompClient.send("/app/note", {}, JSON.stringify(chatMessage));
+            setUserData({...userData, "message": ""});
+
+
+        }
+    }
+
+
     const sendValue = () => {
         if (stompClient) {
             var chatMessage = {
@@ -107,7 +150,7 @@ const ChatRoom = () => {
             setUserData({...userData, "message": ""});
         }
     }
-
+    // handleUsername
     const handleUsername = (event) => {
         const {value} = event.target;
         setUserData({...userData, "username": value});
@@ -117,7 +160,10 @@ const ChatRoom = () => {
         connect();
     }
     return (
+
         <div className="container">
+
+            {/*유저가 연결되었다면*/}
             {userData.connected ?
                 <div className="chat-box">
                     <div className="member-list">
@@ -152,6 +198,7 @@ const ChatRoom = () => {
                                    value={userData.message} onChange={handleMessage}/>
                             <button type="button" className="send-button" onClick={sendValue}>send</button>
                         </div>
+
                     </div>}
                     {tab !== "CHATROOM" && <div className="chat-content">
                         <ul className="chat-messages">
@@ -172,8 +219,13 @@ const ChatRoom = () => {
                                    value={userData.message} onChange={handleMessage}/>
                             <button type="button" className="send-button" onClick={sendPrivateValue}>send</button>
                         </div>
-                    </div>}
+                    </div>
+                    }
+                <textarea onChange={checkChangeInTextarea} >
+
+                </textarea>
                 </div>
+
                 :
                 <div className="register">
                     <input
