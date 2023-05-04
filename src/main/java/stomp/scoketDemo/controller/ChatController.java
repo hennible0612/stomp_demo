@@ -24,7 +24,7 @@ public class ChatController {
     }
 
     @MessageMapping("/note")
-    @SendTo("/note/public")
+    @SendTo("/board/public")
     public Message receiveNote(@Payload Message message){
         System.out.println(message.toString());
         return message;

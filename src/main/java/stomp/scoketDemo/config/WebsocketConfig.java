@@ -14,8 +14,10 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     // 메시지 브로커 발신자와 수신자 사이의 중개자 역할을 한다.
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
+        // 가공해야할시
         registry.setApplicationDestinationPrefixes("/app"); // /app/chatroom /app/user/{유저이름}
-        registry.enableSimpleBroker("/chatroom", "/user", "/note");
+        // queue 는 1 to 1, topic은 broadcast 할때 많이 사용
+        registry.enableSimpleBroker("/chatroom", "/user", "/board");// 스프링 내장 브로커
         registry.setUserDestinationPrefix("/user"); // 특정 유저에게
     }
 
@@ -23,7 +25,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*").withSockJS();
+                .setAllowedOriginPatterns("*").withSockJS(); //sorkJS사용 cors
     }
 
 

@@ -28,14 +28,17 @@ const ChatRoom = () => {
 
     const onConnected = () => {
         setUserData({...userData, "connected": true});
+
+        //구독 목록들
         stompClient.subscribe('/chatroom/public', onMessageReceived);
 
-
+        // 접속한 자기 자신 채널 구독
         stompClient.subscribe('/user/' + userData.username + '/private', onPrivateMessage);
 
-        // 받았을때
-        stompClient.subscribe('/note/public', onNoteReceived);
+        //
+        stompClient.subscribe('/board/public', onNoteReceived);
 
+        // 누구 접속시
         userJoin();
     }
 
@@ -50,6 +53,7 @@ const ChatRoom = () => {
     const onMessageReceived = (payload) => {
         var payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
+            //새로운 유저 접속시 채팅창에 추가 
             case "JOIN":
                 if (!privateChats.get(payloadData.senderName)) {
                     privateChats.set(payloadData.senderName, []);
@@ -94,8 +98,7 @@ const ChatRoom = () => {
         console.log("-----------------------------------")
         console.log(parsedMessage.message)
         console.log("-----------------------------------")
-        setPublicNote(payload);
-
+        // setPublicNote(parsedMessage.message);
     };
 
     //notion 처럼 공유 메모
